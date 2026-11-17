@@ -1,69 +1,221 @@
 import Image from "next/image";
+import styles from "./page.module.css";
+
+const pasos = [
+  {
+    numero: "01",
+    titulo: "Busca cerca de ti",
+    texto: "Encuentra un hogar temporal según tu comuna y las necesidades de tu mascota.",
+  },
+  {
+    numero: "02",
+    titulo: "Conoce al anfitrión",
+    texto: "Revisa las características del hogar y coordina un encuentro previo sin compromiso.",
+  },
+  {
+    numero: "03",
+    titulo: "Prepara su estadía",
+    texto: "Comparte sus horarios, alimentación y cuidados para mantener su rutina.",
+  },
+  {
+    numero: "04",
+    titulo: "Mantente cerca",
+    texto: "Nuestra propuesta contempla fotos y reportes para acompañar su día a día.",
+  },
+];
+
+const beneficios = [
+  {
+    titulo: "Un hogar temporal",
+    texto: "Un ambiente hogareño donde tu mascota pueda descansar, jugar y recibir compañía.",
+  },
+  {
+    titulo: "Información para decidir",
+    texto: "Conoce el tipo de vivienda, sus espacios y la experiencia del anfitrión.",
+  },
+  {
+    titulo: "Su rutina importa",
+    texto: "Cada mascota tiene necesidades distintas. Compartirlas es el primer paso para cuidarla.",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <a
+          href="#inicio"
+          className={styles.logo}
+          aria-label="PatitApp, inicio"
+        >
+          <span aria-hidden="true">🐾</span>
+          Patit<span className={styles.accent}>App</span>
+        </a>
+
+        <nav className={styles.nav} aria-label="Navegación principal">
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#beneficios">Nuestra propuesta</a>
+          <a href="#anfitriones">Anfitriones</a>
+        </nav>
+      </header>
+
+      <main>
+        <section id="inicio" className={styles.hero}>
+          <div>
+            <p className={styles.eyebrow}>
+              PEQUEÑAS PATITAS, GRANDES CUIDADOS
+            </p>
+
+            <h1>
+              Tu mascota,
+              <br />
+              como en <span>casa.</span>
+            </h1>
+
+            <p className={styles.intro}>
+              Un hogar temporal y alguien que la cuide con cariño.
+              PatitApp busca conectar a dueños de mascotas con
+              anfitriones en Santiago.
+            </p>
+
+            <a className={styles.button} href="#como-funciona">
+              Conoce cómo funciona →
+            </a>
+
+            <p className={styles.slogan}>
+              Animales confiados, en manos seguras.
+            </p>
+          </div>
+
+          <div className={styles.photo}>
             <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+              src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=1000&q=85&fit=crop"
+              alt="Perro disfrutando al aire libre"
+              fill
+              priority
+              unoptimized
+              sizes="(max-width: 760px) 100vw, 50vw"
+              className={styles.heroImage}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+            <div className={styles.photoCaption}>
+              Un nuevo hogar.
+              <strong>El mismo cariño.</strong>
+            </div>
+          </div>
+        </section>
+
+        <section id="beneficios" className={styles.section}>
+          <p className={styles.eyebrow}>PENSADO PARA SU BIENESTAR</p>
+          <h2>Mucho más que un lugar donde quedarse.</h2>
+
+          <div className={styles.cards}>
+            {beneficios.map((beneficio) => (
+              <article className={styles.card} key={beneficio.titulo}>
+                <h3>{beneficio.titulo}</h3>
+                <p>{beneficio.texto}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="como-funciona" className={styles.stepsSection}>
+          <div className={styles.section}>
+            <p className={styles.eyebrow}>
+              DE TU CASA A UN HOGAR DE CONFIANZA
+            </p>
+            <h2>Tu tranquilidad empieza aquí.</h2>
+
+            <div className={styles.steps}>
+              {pasos.map((paso) => (
+                <article key={paso.numero}>
+                  <span className={styles.stepNumber}>
+                    {paso.numero}
+                  </span>
+                  <h3>{paso.titulo}</h3>
+                  <p>{paso.texto}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="anfitriones" className={styles.section}>
+          <div className={styles.hostBanner}>
+            <div>
+              <p className={styles.eyebrow}>
+                HAZ ESPACIO PARA UNA NUEVA AMISTAD
+              </p>
+              <h2>Tu hogar puede ser su lugar feliz.</h2>
+              <p>
+                La propuesta está dirigida a personas con tiempo,
+                experiencia y un espacio adecuado para recibir mascotas.
+              </p>
+            </div>
+
+            <a className={styles.button} href="#preguntas">
+              Conoce la propuesta →
+            </a>
+          </div>
+        </section>
+
+        <section id="preguntas" className={styles.faq}>
+          <p className={styles.eyebrow}>RESOLVAMOS TUS DUDAS</p>
+          <h2>Antes de hacer las maletas.</h2>
+
+          <details>
+            <summary>¿Qué es PatitApp?</summary>
+            <p>
+              Es un proyecto universitario que propone conectar a
+              dueños de mascotas con anfitriones que puedan hospedarlas
+              temporalmente en sus hogares.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Para quién está pensado?</summary>
+            <p>
+              Para dueños de perros y gatos en Santiago que necesitan
+              apoyo durante viajes o ausencias, y para personas que
+              cuentan con tiempo y espacio para cuidarlos.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Podré conocer el hogar antes de decidir?</summary>
+            <p>
+              El proyecto contempla un encuentro previo gratuito y sin
+              compromiso para conocer al anfitrión, el espacio y las
+              necesidades de tu mascota.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Qué información conviene compartir?</summary>
+            <p>
+              Sus horarios de alimentación, hábitos, comportamiento,
+              necesidades especiales y contactos para emergencias.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Esta página permite hacer reservas?</summary>
+            <p>
+              Esta página presenta la propuesta de PatitApp. La búsqueda
+              de anfitriones y la gestión de reservas corresponden a
+              otros módulos del proyecto.
+            </p>
+          </details>
+        </section>
       </main>
+
+      <footer className={styles.footer}>
+        <a href="#inicio" className={styles.logo}>
+          Patit<span className={styles.accent}>App</span>
+        </a>
+        <p>Animales confiados, en manos seguras.</p>
+        <small>Proyecto académico · Grupo 4 · UDP</small>
+      </footer>
     </div>
   );
 }
