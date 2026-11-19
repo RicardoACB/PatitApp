@@ -1,18 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { geocodificar } from "@/app/actions/geocodificar";
+
+const OPCIONES_RADIO = [
+  { label: "Hasta 1 km", metros: "1000" },
+  { label: "Hasta 2 km", metros: "2000" },
+  { label: "Hasta 3 km", metros: "3000" },
+  { label: "Hasta 4 km", metros: "4000" },
+  { label: "Hasta 5 km", metros: "5000" },
+];
+
+const RADIO_DEFECTO = "1000";
+const TEXTO_UBICACION_ACTUAL = "Mi ubicación actual";
 
 export default function FiltrosCuidador() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // 1. Inicializamos el estado leyendo la URL actual.
+  // 1. Estados inicializados desde la URL (radio por defecto: 1000m = 1 km)
   const [tamano, setTamano] = useState(searchParams.get("tamano") || "");
   const [vivienda, setVivienda] = useState(searchParams.get("vivienda") || "");
+  const [radio, setRadio] = useState(
+    searchParams.get("radio") || RADIO_DEFECTO,
+  );
   const [sinPerros, setSinPerros] = useState(
     searchParams.get("sin_perros") === "true",
   );
@@ -20,14 +34,40 @@ export default function FiltrosCuidador() {
     searchParams.get("sin_gatos") === "true",
   );
 
-  // NUEVO: texto de ubicación (se guarda en la URL para que persista al recargar)
   const [ubicacion, setUbicacion] = useState(
     searchParams.get("ubicacion") || "",
   );
   const [buscando, setBuscando] = useState(false);
   const [errorUbicacion, setErrorUbicacion] = useState("");
 
-  // 2. Función que arma la nueva URL y navega hacia ella
+  // 2. Ubicación actual por defecto al entrar sin coordenadas en la URL
+  useEffect(() => {
+    const tieneCoordenadas = searchParams.has("lat") && searchParams.has("lng");
+    if (tieneCoordenadas || !navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (posicion) => {
+        const { latitude, longitude } = posicion.coords;
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.set("ubicacion", TEXTO_UBICACION_ACTUAL);
+        params.set("lat", latitude.toString());
+        params.set("lng", longitude.toString());
+        params.set("radio", params.get("radio") || RADIO_DEFECTO);
+
+        setUbicacion(TEXTO_UBICACION_ACTUAL);
+        router.replace(`${pathname}?${params.toString()}`);
+      },
+      () => {
+        // Si el usuario rechaza el permiso, no bloqueamos la página
+      },
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+    // Solo se ejecuta al montar el componente
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 3. Función que arma la nueva URL y navega hacia ella
   const aplicarFiltros = async () => {
     setErrorUbicacion("");
     const params = new URLSearchParams(searchParams.toString());
@@ -38,29 +78,28 @@ export default function FiltrosCuidador() {
     if (vivienda) params.set("vivienda", vivienda);
     else params.delete("vivienda");
 
+    params.set("radio", radio || RADIO_DEFECTO);
+
     if (sinPerros) params.set("sin_perros", "true");
     else params.delete("sin_perros");
 
     if (sinGatos) params.set("sin_gatos", "true");
     else params.delete("sin_gatos");
 
-    // NUEVO: ubicación -> coordenadas
     const textoUbicacion = ubicacion.trim();
 
     if (!textoUbicacion) {
-      // Campo vacío: quitamos la ubicación de la URL
       params.delete("ubicacion");
       params.delete("lat");
       params.delete("lng");
     } else if (textoUbicacion !== searchParams.get("ubicacion")) {
-      // El texto cambió: consultamos Nominatim (si no cambió, reutilizamos lat/lng de la URL)
       setBuscando(true);
       const resultado = await geocodificar(textoUbicacion);
       setBuscando(false);
 
       if (!resultado) {
         setErrorUbicacion("No encontramos esa ubicación");
-        return; // No navegamos si falló
+        return;
       }
 
       params.set("ubicacion", textoUbicacion);
@@ -80,7 +119,8 @@ export default function FiltrosCuidador() {
       >
         🐾 Inicio
       </Link>
-      {/* NUEVO: Filtro de ubicación */}
+
+      {/* Filtro de ubicación */}
       <div className="flex flex-col">
         <input
           type="text"
@@ -96,6 +136,19 @@ export default function FiltrosCuidador() {
           </span>
         )}
       </div>
+
+      {/* Filtro de radio de búsqueda (por defecto 1 km / 1000m) */}
+      <select
+        value={radio}
+        onChange={(e) => setRadio(e.target.value)}
+        className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+      >
+        {OPCIONES_RADIO.map(({ label, metros }) => (
+          <option key={metros} value={metros}>
+            {label}
+          </option>
+        ))}
+      </select>
 
       {/* Filtro: Tamaño del perro */}
       <select

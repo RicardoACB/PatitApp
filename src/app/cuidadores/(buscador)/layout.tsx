@@ -19,7 +19,7 @@ export default function BuscadorLayout({ children }: PropsWithChildren) {
         </div>
       </header>
 
-      <main className="flex-grow w-full max-w-[1600px] mx-auto">
+      <main className="flex flex-grow w-full max-w-[1600px] mx-auto">
         {children}
       </main>
     </div>
