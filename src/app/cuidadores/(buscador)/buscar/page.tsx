@@ -2,15 +2,22 @@ import { Suspense } from "react";
 import ListaCuidadores from "../../components/ListaCuidadores";
 import MapaDinamico from "../../components/MapaDinamico";
 import ContenedorBuscador from "../../components/ContenedorBuscador";
+import CargaCuidadores from "../../components/CargaCuidadores";
 
 import prisma from "../../../../../lib/prisma";
-import type { Prisma } from "../../../../../src/generated/prisma/client";
+import { Prisma } from "../../../../../src/generated/prisma/client";
 
 interface BuscadorPageProps {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-// NUEVO: convierte los parámetros lat/lng de la URL en un objeto validado (o null)
+interface CoordenadaCuidador {
+  id: string;
+  latitud: number | null;
+  longitud: number | null;
+}
+
+// Convierte los parámetros lat/lng de la URL en un objeto validado (o null)
 function extraerCentro(
   latParam?: string,
   lngParam?: string,
@@ -20,22 +27,61 @@ function extraerCentro(
   const lat = parseFloat(latParam);
   const lng = parseFloat(lngParam);
 
-  // Descartamos valores no numéricos o fuera de rango (la URL puede ser editada a mano)
   if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
 
   return { lat, lng };
 }
 
+// Valida el radio en metros desde la URL (ej: 1000 a 5000)
+function extraerRadio(radioParam?: string): number | null {
+  if (!radioParam) return null;
+
+  const radio = parseInt(radioParam, 10);
+  if (Number.isNaN(radio) || radio <= 0 || radio > 50000) return null;
+
+  return radio;
+}
+
 async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
   // 1. Extraemos los parámetros de la URL
   const params = await searchParams;
 
-  // NUEVO: coordenadas y texto de la ubicación elegida en el filtro
   const centro = extraerCentro(params.lat, params.lng);
+  const radio = extraerRadio(params.radio);
 
   // 2. Construimos las condiciones dinámicas para Prisma
   const condicionesGenerales: Prisma.cuidadoresWhereInput = {};
+  const mapaCoordenadas = new Map<
+    string,
+    { latitud: number | null; longitud: number | null }
+  >();
+
+  // Filtro espacial con PostGIS usando la columna `ubicacion_geog`
+  if (centro && radio) {
+    const cuidadoresCercanos = await prisma.$queryRaw<CoordenadaCuidador[]>`
+      SELECT
+        id,
+        ST_Y(ubicacion_geog::geometry) AS latitud,
+        ST_X(ubicacion_geog::geometry) AS longitud
+      FROM cuidadores
+      WHERE ubicacion_geog IS NOT NULL
+        AND ST_DWithin(
+          ubicacion_geog,
+          ST_SetSRID(ST_MakePoint(${centro.lng}, ${centro.lat}), 4326)::geography,
+          ${radio}
+        )
+    `;
+
+    for (const c of cuidadoresCercanos) {
+      mapaCoordenadas.set(c.id, {
+        latitud: c.latitud,
+        longitud: c.longitud,
+      });
+    }
+
+    condicionesGenerales.id = { in: cuidadoresCercanos.map((c) => c.id) };
+  }
 
   // Filtros de tamaño
   if (params.tamano === "grande") {
@@ -74,30 +120,60 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
     },
   });
 
-  // 4. Aplanamos los datos y convertimos Decimal -> number
+  // Si no hubo filtro por radio, extraemos lat/lng de `ubicacion_geog` para el mapa
+  if (!(centro && radio) && cuidadoresBD.length > 0) {
+    const ids = cuidadoresBD.map((c) => c.id);
+    const coordenadas = await prisma.$queryRaw<CoordenadaCuidador[]>`
+      SELECT
+        id,
+        ST_Y(ubicacion_geog::geometry) AS latitud,
+        ST_X(ubicacion_geog::geometry) AS longitud
+      FROM cuidadores
+      WHERE id IN (${Prisma.join(ids)})
+        AND ubicacion_geog IS NOT NULL
+    `;
+
+    for (const c of coordenadas) {
+      mapaCoordenadas.set(c.id, {
+        latitud: c.latitud,
+        longitud: c.longitud,
+      });
+    }
+  }
+
+  // 4. Aplanamos los datos, convertimos Decimal -> number e inyectamos lat/lng
   const cuidadoresFormateados = cuidadoresBD.map((cuidador) => {
     const { usuarios, ...restoDelCuidador } = cuidador;
+    const coords = mapaCoordenadas.get(cuidador.id);
 
     return {
       ...restoDelCuidador,
       usuario_id: usuarios?.id,
       nombre: usuarios?.nombre || "Cuidador sin nombre",
       rating: restoDelCuidador.rating ? restoDelCuidador.rating.toNumber() : 0,
+      latitud: coords?.latitud ?? null,
+      longitud: coords?.longitud ?? null,
     };
   });
 
-  // 5. Entregamos los datos a los componentes (el mapa ahora recibe el centro)
+  // 5. Entregamos los datos a los componentes
   return (
     <ContenedorBuscador
-      lista={<ListaCuidadores datos={cuidadoresFormateados} />}
-      mapa={<MapaDinamico datos={cuidadoresFormateados} centro={centro} />}
+      lista={<ListaCuidadores datos={cuidadoresFormateados} radio={radio} />}
+      mapa={
+        <MapaDinamico
+          datos={cuidadoresFormateados}
+          centro={centro}
+          radio={radio}
+        />
+      }
     />
   );
 }
 
 export default function BuscadorPage({ searchParams }: BuscadorPageProps) {
   return (
-    <Suspense fallback={<p>Cargando cuidadores...</p>}>
+    <Suspense fallback={<CargaCuidadores />}>
       <ResultadosBuscador searchParams={searchParams} />
     </Suspense>
   );
