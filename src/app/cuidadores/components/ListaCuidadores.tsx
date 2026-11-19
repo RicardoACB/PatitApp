@@ -1,15 +1,20 @@
 "use client";
 import React from "react";
-// Importamos la interfaz unificada que creamos en types.ts
 import Link from "next/link";
 import { CuidadorData } from "../../../../types/cuidadordata";
 
 interface ListaCuidadoresProps {
   datos: CuidadorData[];
+  radio?: number | null;
 }
 
-export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
-  // Manejo del estado vacío: Si la consulta de Prisma no devuelve a nadie
+export default function ListaCuidadores({
+  datos,
+  radio = null,
+}: ListaCuidadoresProps) {
+  const radioKm = radio ? radio / 1000 : null;
+
+  // Manejo del estado vacío: Si la consulta de Prisma/PostGIS no devuelve a nadie
   if (!datos || datos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center border-2 border-dashed border-gray-300 rounded-xl bg-white">
@@ -18,8 +23,9 @@ export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
           No encontramos cuidadores
         </h3>
         <p className="text-gray-500 mt-2 max-w-md">
-          Intenta ajustar los filtros de tamaño, vivienda o restricciones para
-          ver más resultados disponibles en tu zona.
+          {radioKm
+            ? `No hay cuidadores disponibles en un radio de ${radioKm} km con estos filtros. Intenta ampliar el radio de búsqueda o ajustar las restricciones.`
+            : "Intenta ajustar los filtros de tamaño, vivienda o restricciones para ver más resultados disponibles en tu zona."}
         </p>
       </div>
     );
@@ -31,6 +37,7 @@ export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
       <h2 className="text-lg font-semibold text-gray-800">
         {datos.length}{" "}
         {datos.length === 1 ? "cuidador disponible" : "cuidadores disponibles"}
+        {radioKm ? ` en un radio de ${radioKm} km` : ""}
       </h2>
 
       {/* Renderizado de la lista de tarjetas */}
@@ -49,16 +56,16 @@ function TarjetaCuidador({ cuidador }: { cuidador: CuidadorData }) {
     <div className="flex flex-col sm:flex-row bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group">
       {/* Espacio para la foto de perfil (Placeholder) */}
       <div className="w-full sm:w-56 h-48 sm:h-auto bg-slate-100 relative overflow-hidden flex-shrink-0 border-b sm:border-b-0 sm:border-r border-gray-200">
-        <div className="absolute inset-0 flex items-center justify-center text-slate-400">
+        <div className="absolute inset-0 z-10 flex items-end justify-center text-black">
           <svg
-            className="w-12 h-12 opacity-50"
+            className="w-60 h-60 opacity-50"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
             <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
         </div>
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all"></div>
+        <div className="absolute inset-0 z-0 bg-none bg-opacity-0 group-hover:bg-opacity-5 transition-all"></div>
       </div>
 
       {/* Contenido de la tarjeta */}
