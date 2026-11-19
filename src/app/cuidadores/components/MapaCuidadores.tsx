@@ -60,22 +60,7 @@ export default function MapaCuidadores({
   centro = null,
   radio = null,
 }: MapaCuidadoresProps) {
-  const [isMounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const container = document.getElementById("patitapp-map-container");
-    if (container) {
-      delete (container as unknown as { _leaflet_id?: unknown })._leaflet_id;
-    }
-    setMounted(true);
-
-    return () => {
-      const el = document.getElementById("patitapp-map-container");
-      if (el) {
-        delete (el as unknown as { _leaflet_id?: unknown })._leaflet_id;
-      }
-    };
-  }, []);
+  const [mapKey] = useState(() => crypto.randomUUID());
 
   useEffect(() => {
     delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })
@@ -113,18 +98,10 @@ export default function MapaCuidadores({
     });
   }, []);
 
-  if (!isMounted) {
-    return (
-      <div className="w-full h-full bg-slate-100 rounded-xl animate-pulse flex items-center justify-center text-slate-400 text-sm">
-        Cargando mapa...
-      </div>
-    );
-  }
-
   return (
     <div className="w-full h-full relative z-0">
       <MapContainer
-        id="patitapp-map-container"
+        key={mapKey}
         center={centro ? [centro.lat, centro.lng] : centroSantiago}
         zoom={11}
         scrollWheelZoom={true}
