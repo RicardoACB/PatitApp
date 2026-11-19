@@ -33,12 +33,12 @@ function extraerCentro(
   return { lat, lng };
 }
 
-// Valida el radio en metros desde la URL (ej: 1000 a 5000)
-function extraerRadio(radioParam?: string): number | null {
-  if (!radioParam) return null;
+// Valida el radio en metros desde la URL (por defecto 1000m = 1 km)
+function extraerRadio(radioParam?: string): number {
+  if (!radioParam) return 1000;
 
   const radio = parseInt(radioParam, 10);
-  if (Number.isNaN(radio) || radio <= 0 || radio > 50000) return null;
+  if (Number.isNaN(radio) || radio <= 0 || radio > 50000) return 1000;
 
   return radio;
 }
@@ -47,8 +47,25 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
   // 1. Extraemos los parámetros de la URL
   const params = await searchParams;
 
+  // Si no hay ningún filtro en la URL, no consultamos la base de datos
+  const hayBusqueda = Object.keys(params).length > 0;
+
+  if (!hayBusqueda) {
+    return (
+      <div className="m-auto flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
+        <span className="text-5xl mb-4">🐾</span>
+        <h2 className="text-2xl font-bold text-gray-800">Patitapp</h2>
+        <p className="text-gray-500 mt-2 max-w-md">
+          Inicia con una búsqueda usando los filtros de arriba para encontrar
+          cuidadores cerca de ti.
+        </p>
+      </div>
+    );
+  }
+
   const centro = extraerCentro(params.lat, params.lng);
   const radio = extraerRadio(params.radio);
+  const radioActivo = centro ? radio : null;
 
   // 2. Construimos las condiciones dinámicas para Prisma
   const condicionesGenerales: Prisma.cuidadoresWhereInput = {};
@@ -58,7 +75,7 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
   >();
 
   // Filtro espacial con PostGIS usando la columna `ubicacion_geog`
-  if (centro && radio) {
+  if (centro && radioActivo) {
     const cuidadoresCercanos = await prisma.$queryRaw<CoordenadaCuidador[]>`
       SELECT
         id,
@@ -69,7 +86,7 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
         AND ST_DWithin(
           ubicacion_geog,
           ST_SetSRID(ST_MakePoint(${centro.lng}, ${centro.lat}), 4326)::geography,
-          ${radio}
+          ${radioActivo}
         )
     `;
 
@@ -120,8 +137,8 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
     },
   });
 
-  // Si no hubo filtro por radio, extraemos lat/lng de `ubicacion_geog` para el mapa
-  if (!(centro && radio) && cuidadoresBD.length > 0) {
+  // Si no hubo filtro por ubicación/radio, extraemos lat/lng de `ubicacion_geog` para el mapa
+  if (!(centro && radioActivo) && cuidadoresBD.length > 0) {
     const ids = cuidadoresBD.map((c) => c.id);
     const coordenadas = await prisma.$queryRaw<CoordenadaCuidador[]>`
       SELECT
@@ -159,12 +176,14 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
   // 5. Entregamos los datos a los componentes
   return (
     <ContenedorBuscador
-      lista={<ListaCuidadores datos={cuidadoresFormateados} radio={radio} />}
+      lista={
+        <ListaCuidadores datos={cuidadoresFormateados} radio={radioActivo} />
+      }
       mapa={
         <MapaDinamico
           datos={cuidadoresFormateados}
           centro={centro}
-          radio={radio}
+          radio={radioActivo}
         />
       }
     />

@@ -37,26 +37,25 @@ export default function FiltrosCuidador() {
   const [ubicacion, setUbicacion] = useState(
     searchParams.get("ubicacion") || "",
   );
+  const [coordsActuales, setCoordsActuales] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [buscando, setBuscando] = useState(false);
   const [errorUbicacion, setErrorUbicacion] = useState("");
 
-  // 2. Ubicación actual por defecto al entrar sin coordenadas en la URL
+  // 2. Precarga la ubicación actual en memoria sin navegar ni consultar la BD
   useEffect(() => {
     const tieneCoordenadas = searchParams.has("lat") && searchParams.has("lng");
     if (tieneCoordenadas || !navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
       (posicion) => {
-        const { latitude, longitude } = posicion.coords;
-        const params = new URLSearchParams(searchParams.toString());
-
-        params.set("ubicacion", TEXTO_UBICACION_ACTUAL);
-        params.set("lat", latitude.toString());
-        params.set("lng", longitude.toString());
-        params.set("radio", params.get("radio") || RADIO_DEFECTO);
-
-        setUbicacion(TEXTO_UBICACION_ACTUAL);
-        router.replace(`${pathname}?${params.toString()}`);
+        setCoordsActuales({
+          lat: posicion.coords.latitude,
+          lng: posicion.coords.longitude,
+        });
+        setUbicacion((prev) => prev || TEXTO_UBICACION_ACTUAL);
       },
       () => {
         // Si el usuario rechaza el permiso, no bloqueamos la página
@@ -67,7 +66,7 @@ export default function FiltrosCuidador() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 3. Función que arma la nueva URL y navega hacia ella
+  // 3. Función que arma la nueva URL y navega hacia ella al presionar "Filtrar"
   const aplicarFiltros = async () => {
     setErrorUbicacion("");
     const params = new URLSearchParams(searchParams.toString());
@@ -92,6 +91,11 @@ export default function FiltrosCuidador() {
       params.delete("ubicacion");
       params.delete("lat");
       params.delete("lng");
+    } else if (textoUbicacion === TEXTO_UBICACION_ACTUAL && coordsActuales) {
+      // Usamos las coordenadas precargadas sin consultar Nominatim
+      params.set("ubicacion", TEXTO_UBICACION_ACTUAL);
+      params.set("lat", coordsActuales.lat.toString());
+      params.set("lng", coordsActuales.lng.toString());
     } else if (textoUbicacion !== searchParams.get("ubicacion")) {
       setBuscando(true);
       const resultado = await geocodificar(textoUbicacion);
