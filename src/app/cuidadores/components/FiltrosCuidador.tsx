@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { geocodificar } from "@/app/actions/geocodificar";
 
@@ -72,6 +73,13 @@ export default function FiltrosCuidador() {
 
   return (
     <div className="flex flex-nowrap md:flex-wrap items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+      {/* Botón Inicio */}
+      <Link
+        href="/"
+        className="whitespace-nowrap px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5 shrink-0"
+      >
+        🐾 Inicio
+      </Link>
       {/* NUEVO: Filtro de ubicación */}
       <div className="flex flex-col">
         <input
