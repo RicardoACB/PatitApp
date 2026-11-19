@@ -1,9 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-// import { CuidadorData } from '../types';
+import type { CuidadorData } from "../../../../types/cuidadordata";
 
-// Importamos el mapa real de forma dinámica, apagando el SSR
 const MapaCuidadores = dynamic(() => import("./MapaCuidadores"), {
   ssr: false,
   loading: () => (
@@ -13,20 +12,21 @@ const MapaCuidadores = dynamic(() => import("./MapaCuidadores"), {
   ),
 });
 
-// Tipo reutilizable para las coordenadas del filtro
 export interface Centro {
   lat: number;
   lng: number;
 }
 
 interface MapaDinamicoProps {
-  datos: any[]; // Recomendación: cambia "any[]" por "CuidadorData[]"
-  centro?: Centro | null; // NUEVO: coordenadas elegidas en el filtro
+  datos: CuidadorData[];
+  centro?: Centro | null;
+  radio?: number | null;
 }
 
 export default function MapaDinamico({
   datos,
   centro = null,
+  radio = null,
 }: MapaDinamicoProps) {
-  return <MapaCuidadores datos={datos} centro={centro} />;
+  return <MapaCuidadores datos={datos} centro={centro} radio={radio} />;
 }

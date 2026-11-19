@@ -1,15 +1,20 @@
 "use client";
 import React from "react";
-// Importamos la interfaz unificada que creamos en types.ts
 import Link from "next/link";
 import { CuidadorData } from "../../../../types/cuidadordata";
 
 interface ListaCuidadoresProps {
   datos: CuidadorData[];
+  radio?: number | null;
 }
 
-export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
-  // Manejo del estado vacío: Si la consulta de Prisma no devuelve a nadie
+export default function ListaCuidadores({
+  datos,
+  radio = null,
+}: ListaCuidadoresProps) {
+  const radioKm = radio ? radio / 1000 : null;
+
+  // Manejo del estado vacío: Si la consulta de Prisma/PostGIS no devuelve a nadie
   if (!datos || datos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center border-2 border-dashed border-gray-300 rounded-xl bg-white">
@@ -18,8 +23,9 @@ export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
           No encontramos cuidadores
         </h3>
         <p className="text-gray-500 mt-2 max-w-md">
-          Intenta ajustar los filtros de tamaño, vivienda o restricciones para
-          ver más resultados disponibles en tu zona.
+          {radioKm
+            ? `No hay cuidadores disponibles en un radio de ${radioKm} km con estos filtros. Intenta ampliar el radio de búsqueda o ajustar las restricciones.`
+            : "Intenta ajustar los filtros de tamaño, vivienda o restricciones para ver más resultados disponibles en tu zona."}
         </p>
       </div>
     );
@@ -31,6 +37,7 @@ export default function ListaCuidadores({ datos }: ListaCuidadoresProps) {
       <h2 className="text-lg font-semibold text-gray-800">
         {datos.length}{" "}
         {datos.length === 1 ? "cuidador disponible" : "cuidadores disponibles"}
+        {radioKm ? ` en un radio de ${radioKm} km` : ""}
       </h2>
 
       {/* Renderizado de la lista de tarjetas */}

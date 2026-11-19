@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import Link from "next/link";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Circle,
+  useMap,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-interface CuidadorData {
-  id: string;
-  nombre: string;
-  tarifa_noche: number;
-  rating: number;
-  latitud?: number | null;
-  longitud?: number | null;
-}
+import type { CuidadorData } from "../../../../types/cuidadordata";
 
 interface Centro {
   lat: number;
@@ -21,20 +21,36 @@ interface Centro {
 
 interface MapaCuidadoresProps {
   datos: CuidadorData[];
-  centro?: Centro | null; // NUEVO
+  centro?: Centro | null;
+  radio?: number | null;
 }
 
-// NUEVO: mueve la vista del mapa cuando cambian las coordenadas
-function CentrarMapa({ centro }: { centro: Centro | null }) {
+// Ajusta la vista y el zoom del mapa según el centro y el radio elegido
+function CentrarMapa({
+  centro,
+  radio,
+}: {
+  centro: Centro | null;
+  radio: number | null;
+}) {
   const map = useMap();
   const lat = centro?.lat;
   const lng = centro?.lng;
 
   useEffect(() => {
     if (lat !== undefined && lng !== undefined) {
-      map.flyTo([lat, lng], 14);
+      const zoomPorRadio =
+        !radio || radio <= 1000
+          ? 15
+          : radio <= 2000
+            ? 14
+            : radio <= 4000
+              ? 13
+              : 12;
+
+      map.flyTo([lat, lng], zoomPorRadio);
     }
-  }, [lat, lng, map]);
+  }, [lat, lng, radio, map]);
 
   return null;
 }
@@ -42,12 +58,11 @@ function CentrarMapa({ centro }: { centro: Centro | null }) {
 export default function MapaCuidadores({
   datos,
   centro = null,
+  radio = null,
 }: MapaCuidadoresProps) {
-  // 1. Control de montaje y limpieza del contenedor DOM para Leaflet
   const [isMounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Si quedó un contenedor con una instancia previa de Leaflet, limpiamos su ID
     const container = document.getElementById("patitapp-map-container");
     if (container) {
       delete (container as unknown as { _leaflet_id?: unknown })._leaflet_id;
@@ -75,15 +90,26 @@ export default function MapaCuidadores({
     });
   }, []);
 
-  // 2. Centro inicial por defecto (Santiago de Chile)
   const centroSantiago: [number, number] = [-33.4489, -70.6693];
 
+  // Marcador azul para la ubicación del usuario
   const iconoUsuario = useMemo(() => {
     return L.divIcon({
       className: "",
       html: '<div style="width:18px;height:18px;background:#2563eb;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 2px #2563eb55,0 1px 4px rgba(0,0,0,.4)"></div>',
       iconSize: [18, 18],
       iconAnchor: [9, 9],
+    });
+  }, []);
+
+  // Marcador destacado para los cuidadores cercanos
+  const iconoCuidador = useMemo(() => {
+    return L.divIcon({
+      className: "",
+      html: '<div style="width:28px;height:28px;background:#16a34a;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:14px;">🐾</div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -14],
     });
   }, []);
 
@@ -99,9 +125,15 @@ export default function MapaCuidadores({
     <div className="w-full h-full relative z-0">
       <MapContainer
         id="patitapp-map-container"
-        center={centroSantiago}
-        zoom={12}
+        center={centro ? [centro.lat, centro.lng] : centroSantiago}
+        zoom={11}
         scrollWheelZoom={true}
+        maxBounds={[
+          [-34.2917449, -71.7148502],
+          [-32.9222125, -69.7691059],
+        ]}
+        maxBoundsViscosity={0.9}
+        minZoom={11}
         className="w-full h-full rounded-xl shadow-sm border border-gray-200"
       >
         <TileLayer
@@ -109,24 +141,40 @@ export default function MapaCuidadores({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* NUEVO: centra el mapa en la ubicación del filtro */}
-        <CentrarMapa centro={centro} />
+        <CentrarMapa centro={centro} radio={radio} />
 
-        {/* NUEVO: marcador de la ubicación del usuario */}
+        {/* Círculo del radio de búsqueda en metros */}
+        {centro && radio && (
+          <Circle
+            center={[centro.lat, centro.lng]}
+            radius={radio}
+            pathOptions={{
+              color: "#2563eb",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.12,
+              weight: 2,
+            }}
+          />
+        )}
+
+        {/* Marcador de la ubicación del usuario */}
         {centro && (
           <Marker position={[centro.lat, centro.lng]} icon={iconoUsuario}>
             <Popup>Tu ubicación</Popup>
           </Marker>
         )}
 
-        {/* 3. Marcadores de los cuidadores */}
+        {/* Marcadores de los cuidadores cercanos */}
         {datos.map((cuidador) => {
-          if (!cuidador.latitud || !cuidador.longitud) return null;
+          if (cuidador.latitud == null || cuidador.longitud == null) {
+            return null;
+          }
 
           return (
             <Marker
               key={cuidador.id}
               position={[cuidador.latitud, cuidador.longitud]}
+              icon={iconoCuidador}
             >
               <Popup className="rounded-xl">
                 <div className="flex flex-col gap-1 min-w-[140px] p-1">
@@ -145,9 +193,12 @@ export default function MapaCuidadores({
                     ${cuidador.tarifa_noche.toLocaleString("es-CL")} / noche
                   </div>
 
-                  <button className="mt-2 w-full bg-blue-600 text-white text-xs py-1.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                  <Link
+                    href={`/cuidadores/${cuidador.usuario_id}`}
+                    className="mt-2 w-full bg-blue-600 text-white text-center text-xs py-1.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  >
                     Ver perfil
-                  </button>
+                  </Link>
                 </div>
               </Popup>
             </Marker>
