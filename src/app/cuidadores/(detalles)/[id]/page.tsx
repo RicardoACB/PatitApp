@@ -73,7 +73,7 @@ export default async function CuidadorPage({
       <div className="flex-1 flex flex-col gap-10">
         {/* Encabezado del Perfil */}
         <section className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-          <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden bg-gray-200 border-4 border-white shadow-lg">
+          <div className="w-24 h-24 shrink-0 rounded-full overflow-hidden bg-secondary border-4 border-background shadow-lg">
             {userData.foto_url ? (
               <Image
                 src={userData.foto_url}
@@ -87,50 +87,50 @@ export default async function CuidadorPage({
             )}
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
+            <h1 className="text-3xl font-extrabold text-foreground mb-2">
               {userData.nombre}
             </h1>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1 font-semibold text-gray-900">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1 font-semibold text-foreground">
                 ⭐ {ratingFormat}
-                <span className="font-normal text-gray-500">
+                <span className="font-normal text-muted-foreground">
                   ({cuidador.total_reviews} reseñas)
                 </span>
               </span>
               <span>•</span>
-              <span className="text-gray-500">
+              <span className="text-muted-foreground">
                 Última actualización: {fechaActualizacion}
               </span>
             </div>
           </div>
         </section>
 
-        <hr className="border-gray-100" />
+        <hr className="border-border" />
 
         {/* Sobre el Cuidador */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sobre mí</h2>
-          <div className="prose text-gray-600 leading-relaxed whitespace-pre-wrap">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Sobre mí</h2>
+          <div className="prose text-muted-foreground leading-relaxed whitespace-pre-wrap">
             {cuidador.descripcion_perfil ||
               "Este cuidador aún no ha escrito una descripción."}
           </div>
         </section>
 
-        <hr className="border-gray-100" />
+        <hr className="border-border" />
 
         {/* Detalles del Hogar y Mascotas */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-6">
             Detalles del alojamiento
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
             {/* Mascotas aceptadas */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                 🐕 Tamaños que acepta
               </h3>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-muted-foreground">
                 {cuidador.acepta_tamano_pequeno && (
                   <li>✅ Pequeños (0-7 kg)</li>
                 )}
@@ -142,16 +142,18 @@ export default async function CuidadorPage({
                 )}
               </ul>
               {cuidador.acepta_cachorros && (
-                <li>{"🍼 Acepta cachorros (< 1 año)"}</li>
+                <li className="text-muted-foreground">
+                  {"🍼 Acepta cachorros (< 1 año)"}
+                </li>
               )}
             </div>
 
             {/* Características del hogar */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                 🏠 Entorno
               </h3>
-              <ul className="space-y-2 text-gray-600">
+              <ul className="space-y-2 text-muted-foreground">
                 <li className="capitalize">
                   📍 Tipo: {cuidador.tipo_vivienda}
                 </li>
@@ -178,19 +180,21 @@ export default async function CuidadorPage({
 
       {/* COLUMNA DERECHA: Sticky Aside (Caja de reserva) */}
       <aside className="w-full lg:w-96 relative">
-        <div className="sticky top-28 bg-white border border-gray-200 rounded-2xl p-6 shadow-xl">
+        <div className="sticky top-28 bg-card border border-border rounded-2xl p-6 shadow-xl">
           <div className="mb-6">
-            <span className="text-3xl font-black text-gray-900">
+            <span className="text-3xl font-black text-card-foreground">
               ${Number(cuidador.tarifa_noche).toLocaleString("es-CL")}
             </span>
-            <span className="text-gray-500 ml-1 font-medium">/ noche</span>
+            <span className="text-muted-foreground ml-1 font-medium">
+              / noche
+            </span>
           </div>
 
-          <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl transition-all shadow-md">
+          <button className="w-full py-4 bg-primary hover:bg-primary-dark active:bg-primary-dark text-primary-foreground font-bold rounded-xl transition-all shadow-md">
             Solicitar Reserva
           </button>
 
-          <div className="mt-6 flex flex-col gap-3 text-sm text-gray-500">
+          <div className="mt-6 flex flex-col gap-3 text-sm text-muted-foreground">
             <div className="flex justify-between items-center">
               <span>Pago 100% seguro</span>
               <span>🔒</span>
@@ -199,7 +203,7 @@ export default async function CuidadorPage({
               <span>Garantía veterinaria cubierta</span>
               <span>⚕️</span>
             </div>
-            <div className="text-center text-xs mt-2 text-gray-400">
+            <div className="text-center text-xs mt-2 text-muted-foreground/80">
               No se te cobrará ningún monto en este paso.
             </div>
           </div>
