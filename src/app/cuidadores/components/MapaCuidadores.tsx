@@ -77,11 +77,11 @@ export default function MapaCuidadores({
 
   const centroSantiago: [number, number] = [-33.4489, -70.6693];
 
-  // Marcador azul para la ubicación del usuario
+  // Marcador para la ubicación del usuario
   const iconoUsuario = useMemo(() => {
     return L.divIcon({
       className: "",
-      html: '<div style="width:18px;height:18px;background:#2563eb;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 2px #2563eb55,0 1px 4px rgba(0,0,0,.4)"></div>',
+      html: '<div style="width:18px;height:18px;background:var(--primary);border:3px solid var(--primary-foreground);border-radius:50%;box-shadow:0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent),0 1px 4px rgba(0,0,0,.4)"></div>',
       iconSize: [18, 18],
       iconAnchor: [9, 9],
     });
@@ -91,7 +91,7 @@ export default function MapaCuidadores({
   const iconoCuidador = useMemo(() => {
     return L.divIcon({
       className: "",
-      html: '<div style="width:28px;height:28px;background:#16a34a;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:14px;">🐾</div>',
+      html: '<div style="width:28px;height:28px;background:var(--primary-dark);border:3px solid var(--primary-foreground);border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:14px;">🐾</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14],
       popupAnchor: [0, -14],
@@ -111,7 +111,7 @@ export default function MapaCuidadores({
         ]}
         maxBoundsViscosity={0.9}
         minZoom={11}
-        className="w-full h-full rounded-xl shadow-sm border border-gray-200"
+        className="w-full h-full rounded-xl shadow-sm border border-border"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -126,8 +126,8 @@ export default function MapaCuidadores({
             center={[centro.lat, centro.lng]}
             radius={radio}
             pathOptions={{
-              color: "#2563eb",
-              fillColor: "#3b82f6",
+              color: "var(--primary)",
+              fillColor: "var(--primary)",
               fillOpacity: 0.12,
               weight: 2,
             }}
@@ -155,24 +155,24 @@ export default function MapaCuidadores({
             >
               <Popup className="rounded-xl">
                 <div className="flex flex-col gap-1 min-w-[140px] p-1">
-                  <h3 className="font-bold text-gray-900 m-0 text-base leading-tight">
+                  <h3 className="font-bold text-popover-foreground m-0 text-base leading-tight">
                     {cuidador.nombre}
                   </h3>
 
                   <div className="flex items-center gap-1 text-sm">
                     <span className="text-yellow-500">★</span>
-                    <span className="font-semibold text-gray-700">
+                    <span className="font-semibold text-muted-foreground">
                       {cuidador.rating}
                     </span>
                   </div>
 
-                  <div className="text-sm font-medium text-gray-800 mt-1">
+                  <div className="text-sm font-medium text-popover-foreground mt-1">
                     ${cuidador.tarifa_noche.toLocaleString("es-CL")} / noche
                   </div>
 
                   <Link
                     href={`/cuidadores/${cuidador.usuario_id}`}
-                    className="mt-2 w-full bg-blue-600 text-white text-center text-xs py-1.5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="mt-2 w-full bg-primary !text-primary-foreground text-center text-xs py-1.5 rounded-lg font-medium hover:bg-primary-dark transition-colors"
                   >
                     Ver perfil
                   </Link>

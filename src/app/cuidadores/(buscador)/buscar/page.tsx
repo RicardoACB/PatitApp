@@ -54,11 +54,11 @@ async function ResultadosBuscador({ searchParams }: BuscadorPageProps) {
     return (
       <div className="m-auto flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
         <span className="text-5xl mb-4">🐾</span>
-        <h2 className="text-2xl font-bold text-gray-800">
+        <h2 className="text-2xl font-bold text-foreground">
           <span>Patit</span>
           <span className="text-primary">App</span>
         </h2>
-        <p className="text-gray-500 mt-2 max-w-md">
+        <p className="text-muted-foreground mt-2 max-w-md">
           Inicia con una búsqueda usando los filtros de arriba para encontrar
           cuidadores cerca de ti.
         </p>

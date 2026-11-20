@@ -6,7 +6,7 @@ import type { CuidadorData } from "../../../../types/cuidadordata";
 const MapaCuidadores = dynamic(() => import("./MapaCuidadores"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-slate-200 animate-pulse rounded-xl flex items-center justify-center">
+    <div className="w-full h-full bg-secondary text-muted-foreground animate-pulse rounded-xl flex items-center justify-center">
       Cargando mapa interactivo...
     </div>
   ),

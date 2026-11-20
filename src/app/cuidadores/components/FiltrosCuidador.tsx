@@ -119,7 +119,7 @@ export default function FiltrosCuidador() {
       {/* Botón Inicio */}
       <Link
         href="/"
-        className="whitespace-nowrap px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-1.5 shrink-0"
+        className="whitespace-nowrap px-4 py-2 bg-card border border-border rounded-full text-sm font-medium text-card-foreground hover:bg-accent transition-colors flex items-center gap-1.5 shrink-0"
       >
         🐾 Inicio
       </Link>
@@ -132,10 +132,10 @@ export default function FiltrosCuidador() {
           onChange={(e) => setUbicacion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && aplicarFiltros()}
           placeholder="Tu ubicación (ej: Providencia)"
-          className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 bg-card border border-input rounded-full text-sm font-medium text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
         {errorUbicacion && (
-          <span className="text-xs text-red-600 mt-1 ml-2">
+          <span className="text-xs text-destructive mt-1 ml-2">
             {errorUbicacion}
           </span>
         )}
@@ -145,7 +145,7 @@ export default function FiltrosCuidador() {
       <select
         value={radio}
         onChange={(e) => setRadio(e.target.value)}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        className="px-4 py-2 bg-card border border-input rounded-full text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
       >
         {OPCIONES_RADIO.map(({ label, metros }) => (
           <option key={metros} value={metros}>
@@ -158,7 +158,7 @@ export default function FiltrosCuidador() {
       <select
         value={tamano}
         onChange={(e) => setTamano(e.target.value)}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        className="px-4 py-2 bg-card border border-input rounded-full text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
       >
         <option value="">Tamaño de tu perro</option>
         <option value="pequeno">Pequeño (hasta 10kg)</option>
@@ -170,7 +170,7 @@ export default function FiltrosCuidador() {
       <select
         value={vivienda}
         onChange={(e) => setVivienda(e.target.value)}
-        className="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        className="px-4 py-2 bg-card border border-input rounded-full text-sm font-medium text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
       >
         <option value="">Tipo de vivienda</option>
         <option value="casa">Casa con patio</option>
@@ -182,8 +182,8 @@ export default function FiltrosCuidador() {
         onClick={() => setSinPerros(!sinPerros)}
         className={`whitespace-nowrap px-4 py-2 border rounded-full text-sm font-medium transition-colors ${
           sinPerros
-            ? "bg-blue-50 border-blue-300 text-blue-700"
-            : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+            ? "bg-primary/10 border-primary text-primary"
+            : "bg-card border-border text-card-foreground hover:bg-accent"
         }`}
       >
         Sin otros perros
@@ -194,8 +194,8 @@ export default function FiltrosCuidador() {
         onClick={() => setSinGatos(!sinGatos)}
         className={`whitespace-nowrap px-4 py-2 border rounded-full text-sm font-medium transition-colors ${
           sinGatos
-            ? "bg-blue-50 border-blue-300 text-blue-700"
-            : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+            ? "bg-primary/10 border-primary text-primary"
+            : "bg-card border-border text-card-foreground hover:bg-accent"
         }`}
       >
         Sin gatos
@@ -205,7 +205,7 @@ export default function FiltrosCuidador() {
       <button
         onClick={aplicarFiltros}
         disabled={buscando}
-        className="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm ml-2 disabled:opacity-60"
+        className="px-6 py-2 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:bg-primary-dark transition-colors shadow-sm ml-2 disabled:opacity-60"
       >
         {buscando ? "Buscando..." : "Filtrar"}
       </button>
