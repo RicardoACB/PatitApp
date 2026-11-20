@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BotonTheme from "@/components/BotonTheme";
 
 export default function DetallesLayout({
   children,
@@ -8,10 +9,10 @@ export default function DetallesLayout({
   return (
     <>
       {/* HEADER */}
-      <header className="mx-auto flex max-w-[1200px] flex-col items-start gap-4 px-6 py-7 md:flex-row md:items-center md:justify-between md:gap-6">
+      <header className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-4 px-6 py-7 md:flex-nowrap md:gap-6">
         <Link
           href="/"
-          className="inline-flex items-center text-[29px] font-extrabold tracking-[-1px] text-foreground focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-[5px] focus-visible:outline-ring"
+          className="order-1 inline-flex items-center text-[29px] font-extrabold tracking-[-1px] text-foreground focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-[5px] focus-visible:outline-ring"
           aria-label="PatitApp, inicio"
         >
           <span aria-hidden="true" className="mr-[10px]">
@@ -21,7 +22,7 @@ export default function DetallesLayout({
         </Link>
 
         <nav
-          className="flex flex-wrap gap-[15px] text-[13px] md:gap-7 md:text-sm"
+          className="order-3 w-full md:order-2 md:w-auto flex flex-wrap gap-[15px] text-[13px] md:gap-7 md:text-sm"
           aria-label="Navegación principal"
         >
           <Link
@@ -37,6 +38,10 @@ export default function DetallesLayout({
             Buscador
           </Link>
         </nav>
+
+        <div className="order-2 md:order-3">
+          <BotonTheme />
+        </div>
       </header>
 
       {/* CONTENIDO DE LA PÁGINA */}
