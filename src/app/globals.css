@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base */
+  --background: #fafaf9;
+  --foreground: #1a1210;
+  --foreground-muted: #6b5650;
+
+  /* Tarjetas / popovers */
+  --card: #f0ebe3;
+  --card-foreground: #1a1210;
+  --popover: #f0ebe3;
+  --popover-foreground: #1a1210;
+
+  /* Acento (rojo de marca PatitApp) */
+  --primary: #c0392b;
+  --primary-dark: #a93226;
+  --primary-foreground: #ffffff;
+
+  /* Superficies secundarias */
+  --secondary: #e8ddd8;
+  --secondary-foreground: #1a1210;
+
+  /* Paneles / superficies sutiles */
+  --muted: #f0ebe3;
+  --muted-foreground: #6b5650;
+
+  /* Acento de hover (mismo valor que secondary, rol distinto) */
+  --accent: #e8ddd8;
+  --accent-foreground: #1a1210;
+
+  /* Estado destructivo (distinto del primario) */
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+
+  /* Bordes e inputs */
+  --border: #d9cfc8;
+  --input: #d9cfc8;
+  --ring: #c0392b;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Base */
+  --background: #2c1f1a;
+  --foreground: #f5efe6;
+  --foreground-muted: #c4afa8;
+
+  /* Tarjetas / popovers */
+  --card: #3b2820;
+  --card-foreground: #f5efe6;
+  --popover: #3b2820;
+  --popover-foreground: #f5efe6;
+
+  /* Acento — igual en ambos modos, es la identidad de marca */
+  --primary: #c0392b;
+  --primary-dark: #a93226;
+  --primary-foreground: #ffffff;
+
+  /* Superficies secundarias */
+  --secondary: #4a3028;
+  --secondary-foreground: #f5efe6;
+
+  /* Paneles / superficies sutiles */
+  --muted: #3b2820;
+  --muted-foreground: #c4afa8;
+
+  /* Acento de hover */
+  --accent: #4a3028;
+  --accent-foreground: #f5efe6;
+
+  /* Estado destructivo — igual en ambos modos */
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+
+  /* Bordes e inputs */
+  --border: #5c3d30;
+  --input: #5c3d30;
+  --ring: #c0392b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Ajusta a la fuente real del proyecto si usas next/font */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
