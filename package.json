@@ -7,7 +7,9 @@
     "build": "prisma generate && next build",
     "dev": "next dev",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
@@ -24,6 +26,10 @@
   "devDependencies": {
     "@prisma/client": "^7.10.1",
     "@tailwindcss/turbopack": "^4",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^8.0.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/jest": "^30.0.0",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
@@ -33,8 +39,11 @@
     "dotenv": "^18.0.10",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
     "prisma": "7.10.1",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "packageManager": "pnpm@12.6.0"
