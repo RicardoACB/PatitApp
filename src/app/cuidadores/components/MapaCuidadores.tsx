@@ -12,6 +12,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { calcularZoomPorRadio } from "../../../../lib/calcular-zoom-por-radio";
 import type { CuidadorData } from "../../../../types/cuidadordata";
 
 interface Centro {
@@ -39,16 +40,7 @@ function CentrarMapa({
 
   useEffect(() => {
     if (lat !== undefined && lng !== undefined) {
-      const zoomPorRadio =
-        !radio || radio <= 1000
-          ? 15
-          : radio <= 2000
-            ? 14
-            : radio <= 4000
-              ? 13
-              : 12;
-
-      map.flyTo([lat, lng], zoomPorRadio);
+      map.flyTo([lat, lng], calcularZoomPorRadio(radio));
     }
   }, [lat, lng, radio, map]);
 

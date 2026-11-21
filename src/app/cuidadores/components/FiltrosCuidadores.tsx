@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { geocodificar } from "@/app/actions/geocodificar";
+import {
+  RADIO_DEFECTO,
+  construirParamsFiltros,
+} from "../../../../lib/construir-params-filtros";
 
 const OPCIONES_RADIO = [
   { label: "Hasta 1 km", metros: "1000" },
@@ -13,10 +17,9 @@ const OPCIONES_RADIO = [
   { label: "Hasta 5 km", metros: "5000" },
 ];
 
-const RADIO_DEFECTO = "1000";
 const TEXTO_UBICACION_ACTUAL = "Mi ubicación actual";
 
-export default function FiltrosCuidador() {
+export default function FiltrosCuidadores() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -69,34 +72,16 @@ export default function FiltrosCuidador() {
   // 3. Función que arma la nueva URL y navega hacia ella al presionar "Filtrar"
   const aplicarFiltros = async () => {
     setErrorUbicacion("");
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (tamano) params.set("tamano", tamano);
-    else params.delete("tamano");
-
-    if (vivienda) params.set("vivienda", vivienda);
-    else params.delete("vivienda");
-
-    params.set("radio", radio || RADIO_DEFECTO);
-
-    if (sinPerros) params.set("sin_perros", "true");
-    else params.delete("sin_perros");
-
-    if (sinGatos) params.set("sin_gatos", "true");
-    else params.delete("sin_gatos");
-
     const textoUbicacion = ubicacion.trim();
+    let coordenadas: { lat: number; lng: number } | null = null;
 
-    if (!textoUbicacion) {
-      params.delete("ubicacion");
-      params.delete("lat");
-      params.delete("lng");
-    } else if (textoUbicacion === TEXTO_UBICACION_ACTUAL && coordsActuales) {
+    if (textoUbicacion === TEXTO_UBICACION_ACTUAL && coordsActuales) {
       // Usamos las coordenadas precargadas sin consultar Nominatim
-      params.set("ubicacion", TEXTO_UBICACION_ACTUAL);
-      params.set("lat", coordsActuales.lat.toString());
-      params.set("lng", coordsActuales.lng.toString());
-    } else if (textoUbicacion !== searchParams.get("ubicacion")) {
+      coordenadas = coordsActuales;
+    } else if (
+      textoUbicacion &&
+      textoUbicacion !== searchParams.get("ubicacion")
+    ) {
       setBuscando(true);
       const resultado = await geocodificar(textoUbicacion);
       setBuscando(false);
@@ -106,10 +91,18 @@ export default function FiltrosCuidador() {
         return;
       }
 
-      params.set("ubicacion", textoUbicacion);
-      params.set("lat", resultado.lat.toString());
-      params.set("lng", resultado.lng.toString());
+      coordenadas = { lat: resultado.lat, lng: resultado.lng };
     }
+
+    const params = construirParamsFiltros(searchParams.toString(), {
+      tamano,
+      vivienda,
+      radio,
+      sinPerros,
+      sinGatos,
+      ubicacion: textoUbicacion,
+      coordenadas,
+    });
 
     router.push(`${pathname}?${params.toString()}`);
   };

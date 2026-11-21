@@ -1,5 +1,5 @@
 import { PropsWithChildren, Suspense } from "react";
-import FiltrosCuidador from "../components/FiltrosCuidador";
+import FiltrosCuidador from "../components/FiltrosCuidadores";
 import BotonTheme from "@/components/BotonTheme";
 
 export default function BuscadorLayout({ children }: PropsWithChildren) {
