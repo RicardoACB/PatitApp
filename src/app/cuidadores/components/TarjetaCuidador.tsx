@@ -7,7 +7,7 @@ interface TarjetaCuidadorProps {
   cuidador: CuidadorData;
 }
 
-export default function TarjetaCuidadores({ cuidador }: TarjetaCuidadorProps) {
+export default function TarjetaCuidador({ cuidador }: TarjetaCuidadorProps) {
   return (
     <div className="flex flex-col sm:flex-row bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group">
       {/* Espacio para la foto de perfil (Placeholder) */}

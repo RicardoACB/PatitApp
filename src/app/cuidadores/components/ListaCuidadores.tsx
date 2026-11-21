@@ -1,7 +1,7 @@
 "use client";
 
 import { CuidadorData } from "../../../../types/cuidadordata";
-import TarjetaCuidador from "./TarjetaCuidadores";
+import TarjetaCuidador from "./TarjetaCuidador";
 
 interface ListaCuidadoresProps {
   datos: CuidadorData[];
