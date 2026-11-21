@@ -1,21 +1,17 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "../../../../../lib/prisma";
+import { testUUID } from "../../../../../lib/test-uuid";
+import { formatearPerfilCuidador } from "../../../../../lib/formatear-perfil-cuidador";
 
 export default async function CuidadorPage({
   params,
 }: PageProps<"/cuidadores/[id]">) {
   const id = (await params).id;
 
-  function testUUID(str: string) {
-    const regex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return typeof str === "string" && regex.test(str);
-  }
-
   if (!testUUID(id)) notFound();
 
-  // 1. Agregamos el "await" crucial para que se ejecute la consulta
+  // 1. Consulta a la base de datos
   const userData = await prisma.usuarios.findUnique({
     where: {
       id: id,
@@ -43,29 +39,17 @@ export default async function CuidadorPage({
     },
   });
 
-  // 2. Comprobamos si el usuario existe y tiene un perfil de cuidador
-  if (!userData || !userData.cuidadores) {
+  // 2. Comprobamos si el usuario existe y formateamos el perfil
+  if (!userData) {
     notFound();
   }
 
-  // Si Prisma generó "cuidadores" como un array (por el nombre en plural), tomamos el primero.
-  // Si es una relación 1 a 1 y es un objeto, lo usamos directamente.
-  const cuidador = Array.isArray(userData.cuidadores)
-    ? userData.cuidadores[0]
-    : userData.cuidadores;
-
-  if (!cuidador) {
+  const perfil = formatearPerfilCuidador(userData.cuidadores);
+  if (!perfil) {
     notFound();
   }
 
-  // 3. Formateo de datos
-  const fechaActualizacion = cuidador.updated_at
-    ? cuidador.updated_at.toISOString().split("T")[0]
-    : "No registrada";
-
-  const ratingFormat = cuidador.rating
-    ? Number(cuidador.rating).toFixed(1)
-    : "Nuevo";
+  const { cuidador, fechaActualizacion, ratingFormat } = perfil;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col lg:flex-row gap-12">
@@ -78,6 +62,8 @@ export default async function CuidadorPage({
               <Image
                 src={userData.foto_url}
                 alt={`Foto de ${userData.nombre}`}
+                width={96}
+                height={96}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -140,12 +126,10 @@ export default async function CuidadorPage({
                 {cuidador.acepta_tamano_grande && (
                   <li>✅ Grandes (18-45 kg)</li>
                 )}
+                {cuidador.acepta_cachorros && (
+                  <li>{"🍼 Acepta cachorros (< 1 año)"}</li>
+                )}
               </ul>
-              {cuidador.acepta_cachorros && (
-                <li className="text-muted-foreground">
-                  {"🍼 Acepta cachorros (< 1 año)"}
-                </li>
-              )}
             </div>
 
             {/* Características del hogar */}
