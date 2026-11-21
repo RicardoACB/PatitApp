@@ -32,7 +32,6 @@ export default function BotonTheme() {
       className="order-2 md:order-3 size-10 bg-foreground rounded-full flex shadow-md cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
       onClick={() => {
         setTheme(resolvedTheme === "dark" ? "light" : "dark");
-        console.log(resolvedTheme);
       }}
     >
       {resolvedTheme === "dark" ? (
